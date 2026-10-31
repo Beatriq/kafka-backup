@@ -10,6 +10,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - `connection.produce_api_version` sets the Produce API version the client sends (3 to 8, default 8). Redpanda accepts up to version 7 and drops the connection on version 8, so restoring to Redpanda needs `produce_api_version: 7`; without it every topic fails with `early eof`.
 
+### Fixed
+- Requests are now flushed after they are written. Over TLS, a write could report
+  success with the last bytes of a request still in the TLS buffer when the socket
+  was momentarily full. The broker then waited for the rest of the request and the
+  client for the response, so large restore batches hung until the 60-second
+  response timeout and retries could hang the same way.
+
 ## [0.25.2] - 2026-10-14
 
 ### Security
